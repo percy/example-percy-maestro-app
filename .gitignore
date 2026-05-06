@@ -77,3 +77,10 @@ lint/tmp/
 
 # Maestro screenshots
 .maestro/
+
+# npm
+node_modules/
+
+# Build output produced by `npm run prepare-zip`
+Flows*.zip
+flows/percy/
