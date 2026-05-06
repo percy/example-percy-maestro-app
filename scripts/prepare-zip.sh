@@ -29,9 +29,13 @@ rm -rf "$FLOWS_DIR/percy"
 cp -r "$SDK_PERCY" "$FLOWS_DIR/percy"
 
 rm -f "$ZIP_OUT"
-(cd "$FLOWS_DIR" && zip -rq "$ZIP_OUT" .)
+# Zip with `flows/` as the single top-level directory.
+# BrowserStack Maestro v2 requires the test-suite zip's root to be a single
+# parent directory containing the flows; otherwise the scanner fails with
+# "Top-level directories do not contain any Flows".
+(cd "$ROOT_DIR" && zip -rq "$ZIP_OUT" flows)
 
-echo "Wrote $ZIP_OUT (contains: $(cd "$FLOWS_DIR" && find . -name '*.yaml' -not -path '*/percy/*' | sed 's|^\./||' | tr '\n' ' '))"
+echo "Wrote $ZIP_OUT (contains flows/: $(cd "$FLOWS_DIR" && find . -name '*.yaml' -not -path '*/percy/*' | sed 's|^\./||' | tr '\n' ' '))"
 echo
 echo "Upload the zip to BrowserStack:"
 echo "  curl -u \"\$BROWSERSTACK_USERNAME:\$BROWSERSTACK_ACCESS_KEY\" \\"
