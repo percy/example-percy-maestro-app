@@ -1,0 +1,18 @@
+{
+  "name": "example-percy-maestro-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Example app demonstrating Percy visual testing with Maestro on BrowserStack",
+  "scripts": {
+    "prepare-zip": "bash scripts/prepare-zip.sh",
+    "clean": "rm -rf flows/percy Flows.zip"
+  },
+  "devDependencies": {
+    "@percy/cli": "^1.30.0",
+    "@percy/maestro-app": "file:../percy-maestro"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "MIT"
+}

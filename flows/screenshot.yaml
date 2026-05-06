@@ -1,0 +1,27 @@
+appId: com.sample.browserstack.samplecalculator
+env:
+  PERCY_DEVICE_NAME: "Samsung Galaxy S22"
+  PERCY_OS_VERSION: "13"
+  PERCY_SCREEN_WIDTH: "1080"
+  PERCY_SCREEN_HEIGHT: "2340"
+  PERCY_ORIENTATION: "portrait"
+---
+- launchApp
+
+# Snapshot 1: launch screen
+- runFlow:
+    file: percy/flows/percy-screenshot.yaml
+    env:
+      SCREENSHOT_NAME: "Calculator launch"
+
+# Snapshot 2: after entering 12 + 34 =
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "+"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: "="
+- runFlow:
+    file: percy/flows/percy-screenshot.yaml
+    env:
+      SCREENSHOT_NAME: "Calculator result"
