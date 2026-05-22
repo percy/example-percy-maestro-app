@@ -1,11 +1,11 @@
 appId: com.sample.browserstack.samplecalculator
 env:
-  PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-  PERCY_OS_VERSION: "13"
-  PERCY_SCREEN_WIDTH: "1080"
-  PERCY_SCREEN_HEIGHT: "2340"
   PERCY_ORIENTATION: "portrait"
 ---
+# Device metadata (PERCY_DEVICE_NAME, PERCY_OS_VERSION, PERCY_SCREEN_WIDTH,
+# PERCY_SCREEN_HEIGHT) is auto-injected by the BS host on BrowserStack App
+# Automate. See screenshot.yaml for the self-hosted vs BS-hosted caveat.
+
 - launchApp
 
 # Snapshot 1 — coordinate-based region.
@@ -13,7 +13,7 @@ env:
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      SCREENSHOT_NAME: "Regions — coordinate"
+      SCREENSHOT_NAME: "Regions_coordinate"
       PERCY_REGIONS: '[{"top":0,"bottom":50,"left":0,"right":1080,"algorithm":"ignore"}]'
 
 # Snapshot 2 — element-based region.
@@ -25,5 +25,5 @@ env:
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      SCREENSHOT_NAME: "Regions — element"
+      SCREENSHOT_NAME: "Regions_element"
       PERCY_REGIONS: '[{"element":{"resource-id":"com.sample.browserstack.samplecalculator:id/editText"},"algorithm":"ignore"}]'

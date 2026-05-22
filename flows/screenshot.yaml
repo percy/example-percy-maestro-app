@@ -1,18 +1,24 @@
 appId: com.sample.browserstack.samplecalculator
 env:
-  PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-  PERCY_OS_VERSION: "13"
-  PERCY_SCREEN_WIDTH: "1080"
-  PERCY_SCREEN_HEIGHT: "2340"
   PERCY_ORIENTATION: "portrait"
 ---
+# On BrowserStack App Automate, device metadata (PERCY_DEVICE_NAME,
+# PERCY_OS_VERSION, PERCY_SCREEN_WIDTH, PERCY_SCREEN_HEIGHT) is auto-injected
+# by the BS host runner — no need to hardcode them here. Same for
+# PERCY_SESSION_ID and PERCY_SERVER. Customers running self-hosted Maestro
+# (Maestro Cloud, local CI, customer device labs) MUST still set those 4
+# device-metadata vars manually in this `env:` block.
+#
+# PERCY_ORIENTATION is intentionally customer-owned because orientation is
+# a per-snapshot property, not a per-device property.
+
 - launchApp
 
 # Snapshot 1: launch screen
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      SCREENSHOT_NAME: "Calculator launch"
+      SCREENSHOT_NAME: "Calculator_launch"
 
 # Snapshot 2: after entering 12 + 34 =
 - tapOn: "1"
@@ -24,4 +30,4 @@ env:
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      SCREENSHOT_NAME: "Calculator result"
+      SCREENSHOT_NAME: "Calculator_result"
