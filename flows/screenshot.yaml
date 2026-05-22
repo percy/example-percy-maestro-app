@@ -1,20 +1,34 @@
 appId: com.sample.browserstack.samplecalculator
 ---
-- launchApp
+# On BrowserStack App Automate, device metadata (PERCY_DEVICE_NAME,
+# PERCY_OS_VERSION, PERCY_SCREEN_WIDTH, PERCY_SCREEN_HEIGHT) is auto-injected
+# by the BS host runner. Customers running self-hosted Maestro (Maestro Cloud,
+# local CI, customer device labs) MUST still set these 4 env vars manually.
+# PERCY_SESSION_ID and PERCY_SERVER are also auto-injected by the BS host.
+# PERCY_ORIENTATION is intentionally customer-owned because orientation is
+# a per-snapshot property, not a per-device property.
 
-# Snapshot 1: launch screen
+- launchApp
+# Wait for the calculator UI to actually render before taking Snapshot 1.
+# Without this, Calculator_launch can capture mid-launch state where buttons
+# haven't appeared yet, producing unstable baselines.
+- assertVisible: "1"
+
+# Snapshot 1: launch screen — status bar masked.
+# Status bar on Pixel 8 Pro / Android 14: top ~108 px shows time, signal,
+# battery — varies every build and triggers spurious diffs. Mask it via
+# PERCY_IGNORE_REGIONS so the comparison only flags real UI changes.
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      PERCY_SERVER: "http://127.0.0.1:48087"
-      PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-      PERCY_OS_VERSION: "12"
-      PERCY_SCREEN_WIDTH: "1080"
-      PERCY_SCREEN_HEIGHT: "2340"
       PERCY_ORIENTATION: "portrait"
       SCREENSHOT_NAME: "Calculator_launch"
+      # Status bar at 1008-wide / 360dpi: ~108 px tall.
+      PERCY_IGNORE_REGIONS: '[{"top":0,"bottom":108,"left":0,"right":1008}]'
 
-# Snapshot 2: after entering 12 + 34 =
+# Snapshot 2: after entering 12 + 34 = — sync + status-bar + answer-display
+# coordinate masks. The editText answer-display sits roughly between
+# y=434..594 below the status bar.
 - tapOn: "1"
 - tapOn: "2"
 - tapOn: "+"
@@ -24,10 +38,10 @@ appId: com.sample.browserstack.samplecalculator
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      PERCY_SERVER: "http://127.0.0.1:48087"
-      PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-      PERCY_OS_VERSION: "12"
-      PERCY_SCREEN_WIDTH: "1080"
-      PERCY_SCREEN_HEIGHT: "2340"
       PERCY_ORIENTATION: "portrait"
       SCREENSHOT_NAME: "Calculator_result"
+      PERCY_SYNC: "true"
+      # Two masks at 1008-wide / 2244-tall coord space:
+      #   1) status bar:    {0..108, 0..1008}  — time/notifications
+      #   2) editText area: {434..594, 36..972} — the calculator display widget
+      PERCY_IGNORE_REGIONS: '[{"top":0,"bottom":108,"left":0,"right":1008},{"top":434,"bottom":594,"left":36,"right":972}]'

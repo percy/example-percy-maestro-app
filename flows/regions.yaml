@@ -1,35 +1,38 @@
 appId: com.sample.browserstack.samplecalculator
 ---
-- launchApp
+# On BrowserStack App Automate, device metadata (PERCY_DEVICE_NAME,
+# PERCY_OS_VERSION, PERCY_SCREEN_WIDTH, PERCY_SCREEN_HEIGHT, PERCY_SESSION_ID,
+# PERCY_SERVER) is auto-injected by the BS host runner. See screenshot.yaml
+# for the full self-hosted vs BS-hosted caveat.
 
-# Snapshot 1 — coordinate-based region.
-# Masks the device status bar (top 50 px). Anything above y=50 is ignored.
+- launchApp
+- assertVisible: "1"
+
+# Snapshot 1 — status-bar-only mask via PERCY_REGIONS (algorithm:ignore)
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      PERCY_SERVER: "http://127.0.0.1:48087"
-      PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-      PERCY_OS_VERSION: "12"
-      PERCY_SCREEN_WIDTH: "1080"
-      PERCY_SCREEN_HEIGHT: "2340"
       PERCY_ORIENTATION: "portrait"
       SCREENSHOT_NAME: "Regions_coordinate"
-      PERCY_REGIONS: '[{"top":0,"bottom":50,"left":0,"right":1080,"algorithm":"ignore"}]'
+      # Status bar at 1008-wide / 360dpi: ~108 px tall.
+      PERCY_REGIONS: '[{"top":0,"bottom":108,"left":0,"right":1008,"algorithm":"ignore"}]'
 
-# Snapshot 2 — element-based region.
-# Masks the calculator's result display, whose value changes between runs.
-- tapOn: "5"
+# Snapshot 2 — element-area mask (the editText answer display).
+# On hosts where hierarchy resolution works (gRPC/maestro-cli/adb cascade),
+# the relay resolves editText to its bbox and masks the calculator display
+# widget. The 9+9=18 sequence produces a 2-digit answer that differs from
+# the baseline's `8`; with the element-region mask applied, diff stays ~0.
+- tapOn: "9"
 - tapOn: "+"
-- tapOn: "3"
+- tapOn: "9"
 - tapOn: "="
 - runFlow:
     file: percy/flows/percy-screenshot.yaml
     env:
-      PERCY_SERVER: "http://127.0.0.1:48087"
-      PERCY_DEVICE_NAME: "Samsung Galaxy S22"
-      PERCY_OS_VERSION: "12"
-      PERCY_SCREEN_WIDTH: "1080"
-      PERCY_SCREEN_HEIGHT: "2340"
       PERCY_ORIENTATION: "portrait"
       SCREENSHOT_NAME: "Regions_element"
+      # Element-only mask — the resolver returns bbox at (36,434,936,160) on
+      # this host. If the resolver fails (e.g., maestro-not-found on the
+      # cascade fallback), the diff WILL show the answer change — that is
+      # intentional for this snapshot, it isolates the element-region path.
       PERCY_REGIONS: '[{"element":{"resource-id":"com.sample.browserstack.samplecalculator:id/editText"},"algorithm":"ignore"}]'
