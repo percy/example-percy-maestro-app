@@ -131,6 +131,28 @@ To build the APK yourself instead of using the pre-built one:
 
 The APK lands at `app/build/outputs/apk/debug/app-debug.apk`.
 
+## Troubleshooting
+
+### `PERCY_SERVER` in the flow YAMLs
+
+Each `runFlow:` env block sets `PERCY_SERVER: "http://127.0.0.1:48087"`. This is **device-specific** — `48087` is the per-session Percy CLI port that BrowserStack assigns for the Samsung Galaxy S22 device (formula: `4{device_port}` = `4` + `8087`). Different devices may map to a different port.
+
+**Why we hardcode it:** the SDK's documented default `http://percy.cli:5338` doesn't reach the per-session CLI on current BrowserStack hosts (no listener on `5338`, only on the assigned `4{device_port}`). The `maestro_runner.rb` on the host injects `PERCY_SESSION_ID` into the maestro test command's env but does **not** inject `PERCY_SERVER`. Until that's fixed upstream, customers must point their flows at the correct per-session port.
+
+**To find your device's port** during a session:
+- SSH to the BS host and run `lsof -nPi -sTCP:LISTEN | grep percy` while a session is active.
+- Or read the per-session log filename `percy_cli.<session_id>_<port>.log` under `/var/log/browserstack/`.
+
+If your `Flows.zip` upload succeeds and the BS build passes but Percy shows no snapshots ("Snapshot command was not called"), the most likely cause is a stale `PERCY_SERVER`.
+
+### Snapshot names rejected
+
+If you see `[percy] SCREENSHOT_NAME must match [a-zA-Z0-9_-]+` in the maestro log, your snapshot name has invalid characters. The Percy CLI relay enforces alphanumeric + underscore + hyphen only. Use `Calculator_launch` rather than `"Calculator launch"`. See the [SDK README's Snapshot naming section](https://github.com/percy/percy-maestro-app#snapshot-naming).
+
+### Element-region resolver "multi-device-no-serial"
+
+Element regions degrade gracefully (the snapshot still uploads, the region is silently skipped). This is a known cli_manager.rb gap on BrowserStack hosts — `ANDROID_SERIAL` is not injected into the Percy CLI's spawn env, so the resolver can't pick a device when multiple are connected. Coordinate regions are unaffected. Tracked separately as a `browserstack/mobile` follow-up.
+
 ## License
 
 MIT
