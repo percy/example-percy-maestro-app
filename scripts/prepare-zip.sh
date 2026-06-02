@@ -29,7 +29,12 @@ rm -rf "$FLOWS_DIR/percy"
 cp -r "$SDK_PERCY" "$FLOWS_DIR/percy"
 
 rm -f "$ZIP_OUT"
-(cd "$FLOWS_DIR" && zip -rq "$ZIP_OUT" .)
+# BrowserStack requires the test-suite zip to contain a SINGLE root folder.
+# Zipping files at the archive root fails the build with
+# BROWSERSTACK_TESTSUITE_PARSE_ERROR. Zip the flows/ directory itself so
+# "flows/" becomes that single root folder; relative runFlow paths
+# (e.g. percy/flows/percy-screenshot.yaml) resolve unchanged inside it.
+(cd "$ROOT_DIR" && zip -rq "$ZIP_OUT" "$(basename "$FLOWS_DIR")")
 
 echo "Wrote $ZIP_OUT (contains: $(cd "$FLOWS_DIR" && find . -name '*.yaml' -not -path '*/percy/*' | sed 's|^\./||' | tr '\n' ' '))"
 echo
