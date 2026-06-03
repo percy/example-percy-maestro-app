@@ -65,11 +65,10 @@ curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
   -d '{
     "app": "<APP_URL>",
     "testSuite": "<TEST_SUITE_URL>",
-    "devices": ["Samsung Galaxy S22-13.0"],
+    "devices": ["Samsung Galaxy S22-12.0"],
     "project": "Percy Maestro Example",
-    "percyOptions": {
-      "enabled": true,
-      "percyToken": "<PERCY_TOKEN>"
+    "appPercy": {
+      "PERCY_TOKEN": "<PERCY_TOKEN>"
     }
   }'
 ```
@@ -78,7 +77,7 @@ Replace `<APP_URL>`, `<TEST_SUITE_URL>`, and `<PERCY_TOKEN>` with values from pr
 
 BrowserStack runs both `screenshot.yaml` and `regions.yaml` in this build. Percy CLI on the BS host receives the screenshots and uploads them to your Percy project — **4 snapshots total** (2 from each flow).
 
-> **iOS:** trigger the iOS build endpoint instead and use `appPercy` in place of `percyOptions`. See the [SDK README's BrowserStack Integration](https://github.com/percy/percy-maestro-app#browserstack-integration) section for the iOS payload shape.
+> **iOS:** use the same `appPercy` payload, just POST to the iOS build endpoint (`.../maestro/v2/ios/build`) with an iOS app. The `appPercy` field is identical on both platforms. See the [SDK README's BrowserStack Integration](https://github.com/percy/percy-maestro-app#browserstack-integration) section for details.
 
 ### Step 5 — Review the build
 
