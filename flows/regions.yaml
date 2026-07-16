@@ -8,6 +8,13 @@ env:
 
 - launchApp
 
+# Wait for the app's root layout before the first screenshot — see
+# screenshot.yaml for why (app-launch lag can capture the device home screen).
+- extendedWaitUntil:
+    visible:
+      id: "com.sample.browserstack.samplecalculator:id/activity_main"
+    timeout: 15000
+
 # Snapshot 1 — coordinate-based region.
 # Masks the device status bar (top 50 px). Anything above y=50 is ignored.
 - runFlow:
