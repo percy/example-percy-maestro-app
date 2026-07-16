@@ -14,6 +14,15 @@ env:
 
 - launchApp
 
+# Wait for the app's root layout before the first screenshot — without this,
+# app-launch lag can leave the device home screen (or a splash frame) in the
+# Calculator_launch snapshot. activity_main is the root layout id from
+# app/src/main/res/layout/activity_main.xml.
+- extendedWaitUntil:
+    visible:
+      id: "com.sample.browserstack.samplecalculator:id/activity_main"
+    timeout: 15000
+
 # Snapshot 1: launch screen
 - runFlow:
     file: percy/flows/percy-screenshot.yaml

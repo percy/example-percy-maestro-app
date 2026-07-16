@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@percy/cli": "^1.30.0",
-    "@percy/maestro-app": "file:../percy-maestro"
+    "@percy/maestro-app": "^1.0.0"
   },
   "engines": {
     "node": ">=14"
